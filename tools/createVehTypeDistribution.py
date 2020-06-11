@@ -231,7 +231,11 @@ def readConfigFile(options):
                         if attName == "emissionClass":
                             isNumeric = False
                         else:
-                            isNumeric = len(re.findall(r'^(-?[0-9]+(\.[0-9]+)?)$', attValue)) > 0
+                            isNumeric = True
+                            try:
+                                float(attValue)
+                            except ValueError:
+                                isNumeric = False
                         value = FixDistribution((attValue,), isNumeric)
 
                     # get optional limits
