@@ -185,11 +185,14 @@ public:
     long onRightBtnPress(FXObject*, FXSelector, void*);
     long onRightBtnRelease(FXObject*, FXSelector, void*);
     //long onMotion(FXObject*, FXSelector, void*);
+    long onMouseWheel(FXObject*, FXSelector, void*);
     long onMouseMove(FXObject*, FXSelector, void*);
     long onPaint(FXObject*, FXSelector, void*);
     long OnIdle(FXObject* sender, FXSelector sel, void* ptr);
 
 private:
+    void updateViewportChooser();
+
     class SUMOTerrainManipulator : public osgGA::TerrainManipulator {
     public:
         SUMOTerrainManipulator() {

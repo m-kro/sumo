@@ -625,6 +625,11 @@ long GUIOSGView::onLeftBtnRelease(FXObject* sender, FXSelector sel, void* ptr) {
     FXEvent* event = (FXEvent*)ptr;
     myAdapter->getEventQueue()->mouseButtonRelease((float)event->click_x, (float)event->click_y, 1);
 
+    if (!myApp->isGaming()) {
+        // update viewport
+        updateViewportChooser();
+    }
+
     return FXGLCanvas::onLeftBtnRelease(sender, sel, ptr);
 }
 
@@ -643,6 +648,11 @@ long GUIOSGView::onMiddleBtnRelease(FXObject* sender, FXSelector sel, void* ptr)
     FXEvent* event = (FXEvent*)ptr;
     myAdapter->getEventQueue()->mouseButtonRelease((float)event->click_x, (float)event->click_y, 2);
 
+    if (!myApp->isGaming()) {
+        // update viewport
+        updateViewportChooser();
+    }
+
     return FXGLCanvas::onMiddleBtnRelease(sender, sel, ptr);
 }
 
@@ -660,8 +670,20 @@ long GUIOSGView::onRightBtnRelease(FXObject* sender, FXSelector sel, void* ptr) 
     FXEvent* event = (FXEvent*)ptr;
     myAdapter->getEventQueue()->mouseButtonRelease((float)event->click_x, (float)event->click_y, 3);
 
+    if (!myApp->isGaming()) {
+        // update viewport
+        updateViewportChooser();
+    }
+
     return FXGLCanvas::onRightBtnRelease(sender, sel, ptr);
 }
+
+
+long
+GUIOSGView::onMouseWheel(FXObject*, FXSelector, void* ptr) {
+    return 1;
+}
+
 
 long
 GUIOSGView::onMouseMove(FXObject* sender, FXSelector sel, void* ptr) {
@@ -678,6 +700,17 @@ GUIOSGView::OnIdle(FXObject* /* sender */, FXSelector /* sel */, void*) {
     update();
     getApp()->addChore(this, MID_CHORE);
     return 1;
+}
+
+
+void
+GUIOSGView::updateViewportChooser() {
+    if (myViewportChooser != nullptr) {
+        osg::Vec3d lookFromOSG, lookAtOSG, up;
+        myViewer->getCameraManipulator()->getInverseMatrix().getLookAt(lookFromOSG, lookAtOSG, up);
+        Position from(lookFromOSG[0], lookFromOSG[1], lookFromOSG[2]), at(lookAtOSG[0], lookAtOSG[1], lookAtOSG[2]);
+        myViewportChooser->setValues(from, at, 0);
+    }
 }
 
 
