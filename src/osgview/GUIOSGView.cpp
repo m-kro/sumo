@@ -470,7 +470,7 @@ GUIOSGView::showViewportEditor() {
     osg::Vec3d viewAxis, viewUp, orthogonal, normal;
     viewAxis = lookFromOSG - lookAtOSG;
     viewAxis.normalize();
-    viewUp = (viewAxis[0] + viewAxis[1] == 0.) ? osg::Vec3d(0.,1.,0.) : osg::Vec3d(0., 0., 1.); // check for parallel vectors
+    viewUp = (abs(viewAxis[0]) + abs(viewAxis[1]) == 0.) ? osg::Vec3d(0.,1.,0.) : osg::Vec3d(0., 0., 1.); // check for parallel vectors
     orthogonal = viewUp ^ viewAxis;
     orthogonal.normalize();
     normal = viewAxis ^ orthogonal;
@@ -498,7 +498,7 @@ GUIOSGView::setViewportFromToRot(const Position& lookFrom, const Position& lookA
     osg::Vec3d viewAxis, viewUp, orthogonal, normal;
     viewAxis = lookFromOSG - lookAtOSG;
     viewAxis.normalize();
-    viewUp = (viewAxis[0] + viewAxis[1] == 0.) ? osg::Vec3d(0., 1., 0.) : osg::Vec3d(0., 0., 1.); // check for parallel vectors
+    viewUp = (abs(viewAxis[0]) + abs(viewAxis[1]) == 0.) ? osg::Vec3d(0., 1., 0.) : osg::Vec3d(0., 0., 1.); // check for parallel vectors
     orthogonal = viewUp ^ viewAxis;
     orthogonal.normalize();
     normal = viewAxis ^ orthogonal;
