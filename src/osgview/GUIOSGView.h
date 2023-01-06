@@ -201,6 +201,9 @@ public:
     void position(int x, int y, int w, int h);
     void resize(int w, int h);
 
+    // @brief overwrite FOX setCursorPosition function to make it work correctly under Linux
+    FXint setCursorPosition(FXint x, FXint y);
+
     // callback
     long onConfigure(FXObject*, FXSelector, void*);
     long onKeyPress(FXObject*, FXSelector, void*);

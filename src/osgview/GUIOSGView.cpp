@@ -331,6 +331,27 @@ GUIOSGView::position(int x, int y, int w, int h) {
 }
 
 
+FXint
+GUIOSGView::setCursorPosition(FXint x, FXint y) {
+    if (xid) {
+#ifndef WIN32
+        XWarpPointer(DISPLAY(getApp()), None, xid, 0, 0, 0, 0, x, y);
+        XFlush(DISPLAY(getApp());
+        XSync(DISPLAY(getApp(), 0);
+        return TRUE;
+#else
+        POINT pt;
+        pt.x = x;
+        pt.y = y;
+        ClientToScreen((HWND)xid, &pt);
+        SetCursorPos(pt.x, pt.y);
+        return TRUE;
+#endif
+    }
+    return FALSE;
+}
+
+
 void
 GUIOSGView::recenterView() {
     stopTrack();
