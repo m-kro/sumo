@@ -143,7 +143,7 @@ MSInductLoop::notifyMove(SUMOTrafficObject& veh, double oldPos,
     if (newPos >= myPosition && oldPos < myPosition) {
         // entered the detector by move
         const double timeBeforeEnter = MSCFModel::passingTime(oldPos, myPosition, newPos, oldSpeed, newSpeed);
-        myVehiclesOnDet[&veh] = SIMTIME + timeBeforeEnter;
+        myVehiclesOnDet[&veh] = SIMTIME - TS + timeBeforeEnter;
         myEnteredVehicleNumber++;
 #ifdef DEBUG_E1_NOTIFY_MOVE
         if (DEBUG_COND) {
@@ -161,7 +161,7 @@ MSInductLoop::notifyMove(SUMOTrafficObject& veh, double oldPos,
             const std::map<SUMOTrafficObject*, double>::iterator it = myVehiclesOnDet.find(&veh);
             if (it != myVehiclesOnDet.end()) {
                 const double entryTime = it->second;
-                const double leaveTime = SIMTIME + MSCFModel::passingTime(oldBackPos, myEndPosition, newBackPos, oldSpeed, newSpeed);
+                const double leaveTime = SIMTIME - TS + MSCFModel::passingTime(oldBackPos, myEndPosition, newBackPos, oldSpeed, newSpeed);
                 myVehiclesOnDet.erase(it);
                 assert(entryTime <= leaveTime);
                 myVehicleDataCont.push_back(VehicleData(veh, entryTime, leaveTime, false, myEndPosition - myPosition));
@@ -208,7 +208,7 @@ MSInductLoop::notifyLeave(SUMOTrafficObject& veh, double lastPos, MSMoveReminder
         const std::map<SUMOTrafficObject*, double>::iterator it = myVehiclesOnDet.find(&veh);
         if (it != myVehiclesOnDet.end()) {
             const double entryTime = it->second;
-            const double leaveTime = SIMTIME + TS;
+            const double leaveTime = SIMTIME; // +TS;
             myVehiclesOnDet.erase(it);
             myVehicleDataCont.push_back(VehicleData(veh, entryTime, leaveTime, true));
             myLastLeaveTime = leaveTime;
@@ -473,8 +473,8 @@ MSInductLoop::collectVehiclesOnDet(SUMOTime tMS, bool includeEarly, bool leaveTi
         }
     }
     for (const auto& i : myVehiclesOnDet) {
-        if ((!lastInterval && (i.second >= t || leaveTime || forOccupancy))
-                || (lastInterval && i.second < t)) { // no need to check leave time, they are still on the detector
+        if ((!lastInterval && (i.second >= t - TS || leaveTime || forOccupancy))
+                || (lastInterval && i.second < t - TS)) { // no need to check leave time, they are still on the detector
             SUMOTrafficObject* const v = i.first;
             VehicleData d(*v, i.second, HAS_NOT_LEFT_DETECTOR, false);
             d.speedM = v->getSpeed();
