@@ -23,6 +23,8 @@
 #pragma once
 #include <config.h>
 
+#include <utils/foxtools/fxheader.h>
+
 #include <string>
 #include <utils/geom/Boundary.h>
 #include <utils/geom/Position.h>
@@ -150,6 +152,9 @@ private:
 
     /// @brief whether game mode was set to 'tls'
     bool myTLSGame;
+
+    /// @brief GL context
+    FXGLContext* myContext;
 
 #ifdef HAVE_FFMPEG
     GUIVideoEncoder* myCurrentVideo;

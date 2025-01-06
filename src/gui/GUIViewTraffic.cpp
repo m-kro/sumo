@@ -23,6 +23,8 @@
 /****************************************************************************/
 #include <config.h>
 
+#include <GL/glew.h>
+
 #ifdef HAVE_FFMPEG
 #include <utils/gui/div/GUIVideoEncoder.h>
 #endif
@@ -83,11 +85,25 @@ GUIViewTraffic::GUIViewTraffic(
 #ifdef HAVE_FFMPEG
     , myCurrentVideo(nullptr)
 #endif
-{}
+{
+    myContext = new FXGLContext(app.getApp(), glVis);
+    myContext->create();
+    myContext->begin(this);
+
+    GLenum err = glewInit();
+    if (GLEW_OK != err) {
+        WRITE_ERRORF("GLEW OpenGL init failed with error code %", toString(err));
+    } else {
+        WRITE_MESSAGEF("GLEW OpenGL init passed with return code %", toString(err));
+    }
+
+    myContext->end();
+}
 
 
 GUIViewTraffic::~GUIViewTraffic() {
     endSnapshot();
+    delete myContext;
 }
 
 
