@@ -32,6 +32,8 @@ class GNEFrame;
 class GNENet;
 class GNEUndoList;
 class GNEViewParent;
+class MFXGLCanvas;
+class MFXGLVisual;
 
 // ===========================================================================
 // class definitions
@@ -60,7 +62,7 @@ public:
      */
     GNEViewNet(FXComposite* tmpParent, FXComposite* actualParent, GUIMainWindow& app,
                GNEViewParent* viewParent, GNENet* net, GNEUndoList* undoList,
-               FXGLVisual* glVis, FXGLCanvas* share);
+               MFXGLVisual* glVis, MFXGLCanvas* share);
 
     /// @brief destructor
     ~GNEViewNet();

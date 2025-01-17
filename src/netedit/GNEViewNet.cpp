@@ -247,13 +247,12 @@ FXDEFMAP(GNEViewNet) GNEViewNetMap[] = {
 // Object implementation
 FXIMPLEMENT(GNEViewNet, GUISUMOAbstractView, GNEViewNetMap, ARRAYNUMBER(GNEViewNetMap))
 
-
 // ===========================================================================
 // member method definitions
 // ===========================================================================
 GNEViewNet::GNEViewNet(FXComposite* tmpParent, FXComposite* actualParent, GUIMainWindow& app,
                        GNEViewParent* viewParent, GNENet* net, GNEUndoList* undoList,
-                       FXGLVisual* glVis, FXGLCanvas* share) :
+                       MFXGLVisual* glVis, MFXGLCanvas* share) :
     GUISUMOAbstractView(tmpParent, app, viewParent, net->getGrid(), glVis, share),
     myViewObjectsSelector(this),
     myEditModes(this),

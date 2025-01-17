@@ -27,6 +27,8 @@
 #include <vector>
 #include <map>
 #include <utils/foxtools/fxheader.h>
+#include <utils/foxtools/MFXGLCanvas.h>
+#include <utils/foxtools/MFXGLVisual.h>
 // fx3d includes windows.h so we need to guard against macro pollution
 #ifdef WIN32
 #define NOMINMAX
@@ -80,12 +82,12 @@ struct ComparatorClickPriority {
  * It shall be the main class to inherit views of the simulation (micro-
  * or macroscopic ones) from it.
  */
-class GUISUMOAbstractView : public FXGLCanvas {
+class GUISUMOAbstractView : public MFXGLCanvas {
     FXDECLARE(GUISUMOAbstractView)
 
 public:
     /// @brief constructor
-    GUISUMOAbstractView(FXComposite* p, GUIMainWindow& app, GUIGlChildWindow* parent, const SUMORTree& grid, FXGLVisual* glVis, FXGLCanvas* share);
+    GUISUMOAbstractView(FXComposite* p, GUIMainWindow& app, GUIGlChildWindow* parent, const SUMORTree& grid, MFXGLVisual* glVis, MFXGLCanvas* share);
 
     /// @brief destructor
     virtual ~GUISUMOAbstractView();

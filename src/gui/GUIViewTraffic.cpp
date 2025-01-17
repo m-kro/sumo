@@ -23,6 +23,10 @@
 /****************************************************************************/
 #include <config.h>
 
+#ifndef GLEW_STATIC
+#define GLEW_STATIC
+#endif
+
 #include <GL/glew.h>
 
 #ifdef HAVE_FFMPEG
@@ -73,12 +77,13 @@
 // ===========================================================================
 // member method definitions
 // ===========================================================================
+
 GUIViewTraffic::GUIViewTraffic(
     FXComposite* p,
     GUIMainWindow& app,
     GUISUMOViewParent* parent,
-    GUINet& net, FXGLVisual* glVis,
-    FXGLCanvas* share) :
+    GUINet& net, MFXGLVisual* glVis,
+    MFXGLCanvas* share) :
     GUISUMOAbstractView(p, app, parent, net.getVisualisationSpeedUp(), glVis, share),
     myTrackedID(GUIGlObject::INVALID_ID),
     myTLSGame(OptionsCont::getOptions().getString("game.mode") == "tls")
@@ -86,24 +91,22 @@ GUIViewTraffic::GUIViewTraffic(
     , myCurrentVideo(nullptr)
 #endif
 {
-    myContext = new FXGLContext(app.getApp(), glVis);
-    myContext->create();
-    myContext->begin(this);
-
+    /*
+    makeCurrent();
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         WRITE_ERRORF("GLEW OpenGL init failed with error code %", toString(err));
     } else {
         WRITE_MESSAGEF("GLEW OpenGL init passed with return code %", toString(err));
     }
-
-    myContext->end();
+    makeNonCurrent();
+    */
 }
 
 
 GUIViewTraffic::~GUIViewTraffic() {
     endSnapshot();
-    delete myContext;
+    //delete myContext;
 }
 
 

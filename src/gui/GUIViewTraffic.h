@@ -42,7 +42,8 @@ class GUISUMOViewParent;
 class GUIVehicle;
 class GUIVideoEncoder;
 class MSRoute;
-
+class MFXGLcanvas;
+class MFXGLVisual;
 
 // ===========================================================================
 // class definitions
@@ -55,8 +56,8 @@ class GUIViewTraffic : public GUISUMOAbstractView {
 public:
     /// @brief constructor
     GUIViewTraffic(FXComposite* p, GUIMainWindow& app,
-                   GUISUMOViewParent* parent, GUINet& net, FXGLVisual* glVis,
-                   FXGLCanvas* share);
+                   GUISUMOViewParent* parent, GUINet& net, MFXGLVisual* glVis,
+                   MFXGLCanvas* share);
     /// @brief destructor
     virtual ~GUIViewTraffic();
 
@@ -152,9 +153,6 @@ private:
 
     /// @brief whether game mode was set to 'tls'
     bool myTLSGame;
-
-    /// @brief GL context
-    FXGLContext* myContext;
 
 #ifdef HAVE_FFMPEG
     GUIVideoEncoder* myCurrentVideo;

@@ -1488,7 +1488,7 @@ GNEApplicationWindow::fillMenuBar() {
 }
 
 
-FXGLCanvas*
+MFXGLCanvas*
 GNEApplicationWindow::getBuildGLCanvas() const {
     // netedit uses only a single View, then return nullptr
     return nullptr;

@@ -47,6 +47,8 @@ class GUILaneWrapper;
 class MSRoute;
 class MSTransportable;
 class MSVehicle;
+class MFXGLCanvas;
+class MFXGLVisual;
 
 namespace osgGA {
 class CameraManipulator;
@@ -138,8 +140,8 @@ public:
 
     /// @brief constructor
     GUIOSGView(FXComposite* p, GUIMainWindow& app,
-               GUISUMOViewParent* parent, GUINet& net, FXGLVisual* glVis,
-               FXGLCanvas* share);
+               GUISUMOViewParent* parent, GUINet& net, MFXGLVisual* glVis,
+               MFXGLCanvas* share);
 
     /// @brief destructor
     virtual ~GUIOSGView();
