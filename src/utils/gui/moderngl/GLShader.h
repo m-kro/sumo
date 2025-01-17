@@ -17,10 +17,13 @@
 ///
 //
 /****************************************************************************/
+#pragma once
+#include <config.h>
+
 #include <GL/glew.h>
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 class GLShader {
 
@@ -33,8 +36,8 @@ public:
     GLuint getProgramID() const { return myProgramID; };
     GLuint getVertexShaderID() const { return myVertexShaderID; };
     GLuint getFragmentShaderID() const { return myFragmentShaderID; };
-
-
+    GLuint getUniformID(const std::string& key);
+    
     std::string readShaderFile(const std::string& path) const;
 
 private:
@@ -44,5 +47,5 @@ private:
     GLuint myProgramID;
     GLuint myVertexShaderID;
     GLuint myFragmentShaderID;
-
+    std::unordered_map<std::string, GLuint> myUniforms;
 };

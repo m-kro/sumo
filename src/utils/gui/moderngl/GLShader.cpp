@@ -45,7 +45,7 @@ GLShader::GLShader(const std::string& vertexShaderPath, const std::string& fragm
 
 
 GLShader::~GLShader() {
-
+    glDeleteProgram(myProgramID);
 }
 
 
@@ -61,15 +61,23 @@ GLShader::unbind() const {
 }
 
 
+GLuint
+GLShader::getUniformID(const std::string& key) {
+    if (myUniforms.find(key) == myUniforms.end()) {
+        myUniforms[key] = glGetUniformLocation(myProgramID, key.c_str());
+    }
+    return myUniforms[key];
+}
+
+
 std::string GLShader::readShaderFile(const std::string& path) const {
     if (!FileHelpers::isReadable(path)) {
         throw InvalidArgument("Cannot load GL shader definition " + path);
     }
     std::ifstream file(path);
     std::stringstream ss;
-    std::string line;
-    while (getline(file, line)) {
-        ss << line << '\n';
+    if (file.is_open()) {
+        ss << file.rdbuf();
     }
     return ss.str();
 }

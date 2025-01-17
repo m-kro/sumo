@@ -21,6 +21,8 @@
 #include <GL/glew.h>
 //#include <stdbool.h>
 
+#include <utils/gui/div/GLHelper.h>
+
 #include "MFXGLCanvas.h"
 //#include "MFXGLVisual.h"
 
@@ -48,6 +50,8 @@
 #define WGL_FULL_ACCELERATION_ARB                 0x2027
 #define WGL_TYPE_RGBA_ARB                         0x202B
 
+#define WGL_CONTEXT_DEBUG_BIT_ARB                 0x00000001
+#define WGL_CONTEXT_FLAGS_ARB                     0x2094
 /*
   OLD JEROEN COMMENTS:
   Notes:
@@ -270,11 +274,19 @@ void MFXGLCanvas::create(){
         throw FXWindowException("Failed to set the OpenGL 3.3 pixel format.");
     }
 
+#if _DEBUG
+    int flags = 0;
+    flags |= WGL_CONTEXT_DEBUG_BIT_ARB;
+#endif
+
     // Specify that we want to create an OpenGL 3.3 core profile context
     int gl33_attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
         WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB, // WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+#if _DEBUG
+        WGL_CONTEXT_FLAGS_ARB, flags,
+#endif
         0,
     };
 
@@ -288,6 +300,17 @@ void MFXGLCanvas::create(){
         FXTRACE((50, "MFXGLCanvas::create Failed to activate OpenGL 3.3 rendering context.\n"));
         throw FXWindowException("Failed to activate OpenGL 3.3 rendering context.");
     }
+
+#if _DEBUG
+    int contextFlags = 0;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &contextFlags);
+    if (contextFlags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(GLDebugMessageCallback, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    }
+#endif
 
     // Make that the pixel format of the device context
     /*
@@ -319,7 +342,6 @@ void MFXGLCanvas::create(){
         throw FXWindowException("unable to create GL window.");
     }
     */
-
 
     GLenum err = glewInit();
     FXTRACE((1, "GLEW init returned %u\n", err));
