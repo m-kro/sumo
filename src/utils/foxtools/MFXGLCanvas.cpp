@@ -18,40 +18,22 @@
 // GL canvas ready for OpenGL3.3
 /****************************************************************************/
 #include <windows.h>
-#include <GL/glew.h>
-//#include <stdbool.h>
-
-#include <utils/gui/div/GLHelper.h>
-
+//#include <GL/glew.h>
 #include "MFXGLCanvas.h"
+#ifdef WIN32
+#include <GL/wglew.h>
+#else
+#include <GL/glxew.h>
+#endif
+
 //#include "MFXGLVisual.h"
 
 //#include <utils/common/MsgHandler.h>
-
 
 #ifndef HAVE_GL_H
 #define HAVE_GL_H
 #endif
 
-
-#define WGL_CONTEXT_MAJOR_VERSION_ARB             0x2091
-#define WGL_CONTEXT_MINOR_VERSION_ARB             0x2092
-#define WGL_CONTEXT_PROFILE_MASK_ARB              0x9126
-#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB          0x00000001
-#define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
-#define WGL_DRAW_TO_WINDOW_ARB                    0x2001
-#define WGL_ACCELERATION_ARB                      0x2003
-#define WGL_SUPPORT_OPENGL_ARB                    0x2010
-#define WGL_DOUBLE_BUFFER_ARB                     0x2011
-#define WGL_PIXEL_TYPE_ARB                        0x2013
-#define WGL_COLOR_BITS_ARB                        0x2014
-#define WGL_DEPTH_BITS_ARB                        0x2022
-#define WGL_STENCIL_BITS_ARB                      0x2023
-#define WGL_FULL_ACCELERATION_ARB                 0x2027
-#define WGL_TYPE_RGBA_ARB                         0x202B
-
-#define WGL_CONTEXT_DEBUG_BIT_ARB                 0x00000001
-#define WGL_CONTEXT_FLAGS_ARB                     0x2094
 /*
   OLD JEROEN COMMENTS:
   Notes:
@@ -191,9 +173,9 @@ void MFXGLCanvas::create(){
             throw FX::FXWindowException("Failed to activate dummy OpenGL rendering context.");
         }
 
-        wglCreateContextAttribsARB = (wglCreateContextAttribsARB_type*)wglGetProcAddress(
+        myWglCreateContextAttribsARB = (wglCreateContextAttribsARB_type*)wglGetProcAddress(
             "wglCreateContextAttribsARB");
-        wglChoosePixelFormatARB = (wglChoosePixelFormatARB_type*)wglGetProcAddress(
+        myWglChoosePixelFormatARB = (wglChoosePixelFormatARB_type*)wglGetProcAddress(
             "wglChoosePixelFormatARB");
 
         wglMakeCurrent(dummy_dc, 0);
@@ -201,14 +183,12 @@ void MFXGLCanvas::create(){
         ::ReleaseDC(dummy_window, dummy_dc);
         DestroyWindow(dummy_window);
     }
+
     FXTRACE((50, "MFXGLCanvas::create before FXWindow\n"));
-
     FXWindow::create();
-
     FXTRACE((50, "MFXGLCanvas::create after FXWindow\n"));
-#ifdef HAVE_GL_H
 
-    
+#ifdef HAVE_GL_H
     if(!ctx){
         void *sharedctx=NULL;
 
@@ -263,7 +243,7 @@ void MFXGLCanvas::create(){
 
     int pixel_format;
     UINT num_formats;
-    wglChoosePixelFormatARB(hdc, pixel_format_attribs, 0, 1, &pixel_format, &num_formats);
+    myWglChoosePixelFormatARB(hdc, pixel_format_attribs, 0, 1, &pixel_format, &num_formats);
     if (!num_formats) {
         throw FXWindowException("Failed to set the OpenGL 3.3 pixel format.");
     }
@@ -275,8 +255,8 @@ void MFXGLCanvas::create(){
     }
 
 #if _DEBUG
-    int flags = 0;
-    flags |= WGL_CONTEXT_DEBUG_BIT_ARB;
+    int glFlags = 0;
+    glFlags |= WGL_CONTEXT_DEBUG_BIT_ARB;
 #endif
 
     // Specify that we want to create an OpenGL 3.3 core profile context
@@ -285,12 +265,12 @@ void MFXGLCanvas::create(){
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
         WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB, // WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 #if _DEBUG
-        WGL_CONTEXT_FLAGS_ARB, flags,
+        WGL_CONTEXT_FLAGS_ARB, glFlags,
 #endif
         0,
     };
 
-    ctx = wglCreateContextAttribsARB(hdc, 0, gl33_attribs);
+    ctx = myWglCreateContextAttribsARB(hdc, 0, gl33_attribs);
     if (!ctx) {
         FXTRACE((50, "MFXGLCanvas::create Failed to create OpenGL 3.3 context.\n"));
         throw FXWindowException("Failed to create OpenGL 3.3 context.");
@@ -300,17 +280,6 @@ void MFXGLCanvas::create(){
         FXTRACE((50, "MFXGLCanvas::create Failed to activate OpenGL 3.3 rendering context.\n"));
         throw FXWindowException("Failed to activate OpenGL 3.3 rendering context.");
     }
-
-#if _DEBUG
-    int contextFlags = 0;
-    glGetIntegerv(GL_CONTEXT_FLAGS, &contextFlags);
-    if (contextFlags & GL_CONTEXT_FLAG_DEBUG_BIT) {
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageCallback(GLDebugMessageCallback, nullptr);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-    }
-#endif
 
     // Make that the pixel format of the device context
     /*
@@ -345,6 +314,20 @@ void MFXGLCanvas::create(){
 
     GLenum err = glewInit();
     FXTRACE((1, "GLEW init returned %u\n", err));
+
+
+#if _DEBUG
+    if (err == GLEW_OK) {
+        int contextFlags = 0;
+        glGetIntegerv(GL_CONTEXT_FLAGS, &contextFlags);
+        if (contextFlags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(GLDebugMessageCallback, 0);
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+        }
+    }
+#endif
 
     ::ReleaseDC((HWND)xid,hdc);
 
@@ -512,3 +495,5 @@ MFXGLCanvas::~MFXGLCanvas(){
     }
 #endif
   }
+
+

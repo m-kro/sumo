@@ -32,7 +32,9 @@
 #endif
 #endif
 
+#ifndef __glew_h__
 #include <GL/glew.h>
+#endif
 
 //#include <GL/gl.h>
 //#include <GL/glu.h>

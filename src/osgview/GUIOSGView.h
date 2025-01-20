@@ -23,6 +23,7 @@
 
 #ifdef HAVE_OSG
 
+#include <utils/gui/windows/GUISUMOAbstractView.h>
 #include "GUIOSGHeader.h"
 #include "GUIOSGManipulator.h"
 
@@ -33,7 +34,7 @@
 #include <utils/common/RGBColor.h>
 #include <utils/geom/PositionVector.h>
 #include <gui/GUISUMOViewParent.h>
-#include <utils/gui/windows/GUISUMOAbstractView.h>
+
 
 
 // ===========================================================================

@@ -20,7 +20,9 @@
 #pragma once
 #include <config.h>
 
+#ifndef __glew_h__
 #include <GL/glew.h>
+#endif
 #include <string>
 #include <vector>
 #include <unordered_map>

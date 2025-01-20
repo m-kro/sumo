@@ -23,12 +23,6 @@
 /****************************************************************************/
 #include <config.h>
 
-#ifndef GLEW_STATIC
-#define GLEW_STATIC
-#endif
-
-#include <GL/glew.h>
-
 #ifdef HAVE_FFMPEG
 #include <utils/gui/div/GUIVideoEncoder.h>
 #endif

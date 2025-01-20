@@ -23,6 +23,14 @@
 /****************************************************************************/
 #include <config.h>
 
+#ifndef GLEW_STATIC
+#define GLEW_STATIC
+#endif
+
+#ifndef __glew_h__
+#include <GL/glew.h>
+#endif
+
 #include <iostream>
 #include <utility>
 #include <cmath>
