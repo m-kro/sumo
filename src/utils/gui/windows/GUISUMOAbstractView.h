@@ -547,6 +547,7 @@ protected:
     /// @brief helper function for buildColorRainbow
     void buildMinMaxRainbow(const GUIVisualizationSettings& s, GUIColorScheme& scheme, const GUIVisualizationRainbowSettings& rs, double minValue, double maxValue, bool hasMissingData);
 
+    // TODO: refactor into modern OpenGL > populate shader uniform MVP matrices
     /// @brief applies gl-transformations to fit the Boundary given by myChanger onto the canvas.
     /// If fixRatio is true, this boundary will be enlarged to prevent anisotropic stretching.
     /// (this should be set to false when doing selections)
