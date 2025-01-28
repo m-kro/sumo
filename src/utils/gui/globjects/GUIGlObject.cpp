@@ -40,6 +40,7 @@
 #include <utils/gui/div/GUIDesigns.h>
 #include <utils/geom/GeomHelper.h>
 #include <utils/gui/div/GUIGlobalViewObjectsHandler.h>
+#include <utils/gui/moderngl/GLBufferStruct.h>
 #include <utils/options/OptionsCont.h>
 
 #include "GUIGlObject.h"

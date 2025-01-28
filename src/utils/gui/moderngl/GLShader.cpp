@@ -70,6 +70,24 @@ GLShader::getUniformID(const std::string& key) {
 }
 
 
+void
+GLShader::setUniform(const std::string& key, const float value) {
+    glUniform1f(getUniformID(key), value);
+}
+
+
+void
+GLShader::setUniform(const std::string& key, const float v1, const float v2, const float v3) {
+    glUniform3f(getUniformID(key), v1, v2, v3);
+}
+
+
+void
+GLShader::setUniform(const std::string& key, const float v1, const float v2, const float v3, const float v4) {
+    glUniform4f(getUniformID(key), v1, v2, v3, v4);
+}
+
+
 std::string GLShader::readShaderFile(const std::string& path) const {
     if (!FileHelpers::isReadable(path)) {
         throw InvalidArgument("Cannot load GL shader definition " + path);

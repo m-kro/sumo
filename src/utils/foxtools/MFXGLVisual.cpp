@@ -25,6 +25,9 @@
 #define HAVE_GL_H
 #endif
 
+#ifndef __glew_h__
+#include <GL/glew.h>
+#endif
 
 #define DISPLAY(app) ((Display*)((app)->display))
 
@@ -176,19 +179,10 @@ FXbool MFXGLVisual::supported(FXApp* application,int& major,int& minor){
         #endif
         return TRUE;
         #else
-        major=1;
-        #if GL_VERSION_1_4
-        minor=4;
-        #elif GL_VERSION_1_3
-        minor=3;
-        #elif GL_VERSION_1_2
-        minor=2;
-        #elif GL_VERSION_1_1
-        minor=1;
-        #else
-        minor=0;
-        #endif
-        return TRUE;
+        glGetIntegerv(GL_MAJOR_VERSION, &major);
+        glGetIntegerv(GL_MINOR_VERSION, &minor);
+        if (major > 2) { return TRUE; }
+        return FALSE;
         #endif
     #endif
     }
