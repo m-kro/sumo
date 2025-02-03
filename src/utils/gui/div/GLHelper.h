@@ -27,6 +27,7 @@
 #include <utils/common/RGBColor.h>
 #include <utils/geom/PositionVector.h>
 #include <utils/gui/settings/GUIVisualizationSettings.h>
+#include <utils/gui/moderngl/GLBufferStruct.h>
 
 
 // ===========================================================================
@@ -85,6 +86,9 @@ public:
 
     /// @brief check counter name (for debug purposes)
     static void checkCounterName();
+
+    /// @brief get ref to the vertex data
+    static GLBufferStruct* getVertexData();
 
     /** @brief Draws a filled polygon described by the list of points
      * @note this only works well for convex polygons
@@ -437,6 +441,9 @@ private:
 
     /// @brief Storage for precomputed sin/cos-values describing a circle
     static std::vector<std::pair<double, double> > myCircleCoords;
+
+    /// @brief Storage for precomputed sin/cos-values describing a circle
+    static std::vector<GLBufferStruct> myVertices;
 
     /// @brief Font context
     static struct FONScontext* myFont;

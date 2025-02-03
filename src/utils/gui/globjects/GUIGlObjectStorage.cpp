@@ -52,7 +52,7 @@ GUIGlObjectStorage::registerObject(GUIGlObject* object) {
     const GUIGlID id = myNextID;
     if (id == myObjects.size()) {
         myObjects.push_back(object);
-        myObjectCounts[object->getType()] += 1;
+        myObjectCounts[object->getType()]++;
     } else {
         myObjects[id] = object;
     }
@@ -100,7 +100,7 @@ bool
 GUIGlObjectStorage::remove(GUIGlID id) {
     FXMutexLock locker(myLock);
     assert(id < myObjects.size() && myObjects[id] != nullptr);
-    myObjectCounts[myObjects[id]->getType()] -= 1;
+    myObjectCounts[myObjects[id]->getType()]--;
     myFullNameMap.erase(myObjects[id]->getFullName());
     const bool wasBlocked = myObjects[id]->isBlocked();
     myObjects[id] = nullptr;

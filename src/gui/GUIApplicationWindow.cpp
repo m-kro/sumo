@@ -2178,6 +2178,7 @@ GUIApplicationWindow::loadConfigOrNet(const std::string& file) {
         myLoadThread->loadConfigOrNet(file);
         setStatusBarText(TLF("Loading '%'.", file));
         update();
+        WRITE_MESSAGEF("Loaded % edge objects", GUIGlObjectStorage::gIDStorage.getObjectCount(GUIGlObjectType::GLO_EDGE)); // DEBUG
     }
 }
 

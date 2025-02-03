@@ -59,11 +59,15 @@
 // static member definitions
 // ===========================================================================
 
+// TODO: provide a vector which contains the currently collected vertex data (and color data if wished)
+// TODO: optionally provide a vector which prepares data for index buffer (try first without)
+
 int GLHelper::myMatrixCounter = 0;
 int GLHelper::myVertexCounter = 0;
 int GLHelper::myMatrixCounterDebug = 0;
 int GLHelper::myNameCounter = 0;
 std::vector<std::pair<double, double> > GLHelper::myCircleCoords;
+std::vector<GLBufferStruct> GLHelper::myVertices;
 std::vector<RGBColor> GLHelper::myDottedcontourColors;
 FONScontext* GLHelper::myFont = nullptr;
 double GLHelper::myFontSize = 50.0;
@@ -203,6 +207,13 @@ GLHelper::checkCounterName() {
     }
     myNameCounter = 0;
 #endif
+}
+
+
+GLBufferStruct*
+GLHelper::getVertexData() {
+    // TODO: return ref to GLHelper::myVertices
+    return &myVertices.front();
 }
 
 
