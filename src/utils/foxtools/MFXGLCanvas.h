@@ -89,6 +89,9 @@ private:
         /// Destroy the server-side resources for this window
         void destroy();
 
+        /// @brief overload to forward the window size to modern OpenGL (projection using the width/height)
+        long onUpdate(FXObject* sender, FXSelector, void*);
+
         /// Make OpenGL context current prior to performing OpenGL commands
         FXbool makeCurrent();
 

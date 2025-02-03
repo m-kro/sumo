@@ -315,9 +315,9 @@ void MFXGLCanvas::create(){
     GLenum err = glewInit();
     FXTRACE((1, "GLEW init returned %u\n", err));
 
-
-#if _DEBUG
     if (err == GLEW_OK) {
+        glClearColor(1.f, 1.f, 1.f, 0.f);
+#if _DEBUG
         int contextFlags = 0;
         glGetIntegerv(GL_CONTEXT_FLAGS, &contextFlags);
         if (contextFlags & GL_CONTEXT_FLAG_DEBUG_BIT) {
@@ -326,8 +326,8 @@ void MFXGLCanvas::create(){
             glDebugMessageCallback(GLDebugMessageCallback, 0);
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
         }
-    }
 #endif
+    }
 
     ::ReleaseDC((HWND)xid,hdc);
 
@@ -365,6 +365,13 @@ void MFXGLCanvas::destroy(){
 #endif
   FXWindow::destroy();
   }
+
+
+long
+MFXGLCanvas::onUpdate(FXObject* sender, FXSelector sel, void* ptr) {
+    // TODO: change projection info due to updated window size
+    return FXGLCanvas::onUpdate(sender, sel, ptr);
+}
 
 
 //  Make the rendering context of GL Canvas current

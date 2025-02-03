@@ -18,24 +18,29 @@
 //
 /****************************************************************************/
 
+#ifndef __glew_h__
+#include <GL/glew.h>
+#endif
+#include <string>
+#include <map>
+
 struct GLBufferStruct {
-    float x;
-    float y;
-    float r;
-    float g;
-    float b;
-    float a;
-    
-    static const unsigned int getSize() {
-        return 6 * sizeof(float);
+    std::map<std::string, int> attributes;
+    GLuint type = GL_FLOAT;
+
+    const unsigned int getTypeSize() const {
+        return (type == GL_FLOAT) ? sizeof(float) : 0;
     }
-};
 
+    const unsigned int getByteSize() const {
+        return getTypeSize() * getSize();
+    }
 
-struct GLBufferStruct3D : GLBufferStruct {
-    float z;
-
-    static const unsigned int getSize() {
-        return 7 * sizeof(float);
+    const unsigned int getSize() const{
+        unsigned int items = 0;
+        for (auto const& attribute : attributes) {
+            items += attribute.second;
+        }
+        return items;
     }
 };

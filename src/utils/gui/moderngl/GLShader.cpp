@@ -31,60 +31,12 @@
 GLShader::GLShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
     std::string vertexShaderDef = readShaderFile(vertexShaderPath);
     std::string fragmentShaderDef = readShaderFile(fragmentShaderPath);
-    myProgramID = glCreateProgram();
     myVertexShaderID = compileShader(GL_VERTEX_SHADER, vertexShaderDef);
     myFragmentShaderID = compileShader(GL_FRAGMENT_SHADER, fragmentShaderDef);
-    glAttachShader(myProgramID, myVertexShaderID);
-    glAttachShader(myProgramID, myFragmentShaderID);
-    glLinkProgram(myProgramID);
-    glValidateProgram(myProgramID);
-
-    glDeleteShader(myVertexShaderID);
-    glDeleteShader(myFragmentShaderID);
 }
 
 
 GLShader::~GLShader() {
-    glDeleteProgram(myProgramID);
-}
-
-
-void
-GLShader::bind() const {
-    glUseProgram(myProgramID);
-}
-
-
-void
-GLShader::unbind() const {
-    glUseProgram(0);
-}
-
-
-GLuint
-GLShader::getUniformID(const std::string& key) {
-    if (myUniforms.find(key) == myUniforms.end()) {
-        myUniforms[key] = glGetUniformLocation(myProgramID, key.c_str());
-    }
-    return myUniforms[key];
-}
-
-
-void
-GLShader::setUniform(const std::string& key, const float value) {
-    glUniform1f(getUniformID(key), value);
-}
-
-
-void
-GLShader::setUniform(const std::string& key, const float v1, const float v2, const float v3) {
-    glUniform3f(getUniformID(key), v1, v2, v3);
-}
-
-
-void
-GLShader::setUniform(const std::string& key, const float v1, const float v2, const float v3, const float v4) {
-    glUniform4f(getUniformID(key), v1, v2, v3, v4);
 }
 
 
@@ -113,10 +65,9 @@ GLuint GLShader::compileShader(GLuint type, const std::string& source) {
         glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &length);
         std::string log;
         log.resize(length);
-        glGetShaderInfoLog(myProgramID, length, &length, &log[0]);
+        glGetShaderInfoLog(shaderID, length, &length, &log[0]);
         std::string typeName = type == GL_VERTEX_SHADER ? "vertex" : "fragment";
         throw ProcessError("Could not compile GL " + typeName + " shader: " + log);
     }
-
     return shaderID;
 }

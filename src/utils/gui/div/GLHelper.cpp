@@ -49,7 +49,7 @@
 
 #define CIRCLE_RESOLUTION (double)10 // inverse in degrees
 //#define CHECK_PUSHPOP         // enable or disable check push and pop matrix/names
-//#define CHECK_ELEMENTCOUNTER  // enable or disable element counter (for matrix and vertex)
+#define CHECK_ELEMENTCOUNTER  // enable or disable element counter (for matrix and vertex)
 
 #ifndef CALLBACK
 #define CALLBACK
@@ -111,6 +111,12 @@ GLHelper::angleLookup(double angleDeg) {
     }
     assert(index >= 0);
     return (int)index;
+}
+
+
+void
+GLHelper::resetVertexCounters() {
+
 }
 
 
@@ -285,6 +291,15 @@ GLHelper::drawRectangle(const Position& center, const double width, const double
     glVertex2d(-halfWidth, -halfHeight);
     glVertex2d(halfWidth, -halfHeight);
     glVertex2d(halfWidth, halfHeight);
+
+    // order of vertices if triangles should be created:
+    // -0.5, 0.5
+    // -0.5,-0.5
+    //  0.5,-0.5
+    // -0.5, 0.5
+    //  0.5,-0.5
+    //  0.5, 0.5
+
     glEnd();
     GLHelper::popMatrix();
 #ifdef CHECK_ELEMENTCOUNTER

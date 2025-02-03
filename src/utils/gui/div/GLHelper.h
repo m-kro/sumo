@@ -35,8 +35,6 @@
 struct GUIVisualizationTextSettings;
 
 
-
-
 // ===========================================================================
 // class definitions
 // ===========================================================================
@@ -54,6 +52,9 @@ public:
 
     /// @brief normalize angle for lookup in myCircleCoords
     static int angleLookup(double angleDeg);
+
+    /// @brief reset the global vertex counters
+    static void resetVertexCounters();
 
     /// @brief push matrix
     static void pushMatrix();
@@ -96,7 +97,7 @@ public:
 
     /** @brief Draws a filled polygon described by the list of points
      * @note this works for convex and concave polygons but is slower than
-     * drawFilledPoly
+     * drawFilledPoly --> UNUSED
      *
      * @param[in] v The polygon to draw
      * @param[in] close Whether the first point shall be appended

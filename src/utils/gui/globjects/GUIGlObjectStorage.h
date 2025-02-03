@@ -131,12 +131,18 @@ public:
     /// @brief Returns the set of all known objects
     const std::vector<GUIGlObject*>& getAllGLObjects() const;
 
+    /// @brief Returns the set of all known objects
+    long getObjectCount(GUIGlObjectType type) const;
+
 private:
     /// @brief The known objects
     std::vector<GUIGlObject*> myObjects;
 
     /// @brief The known objects by their full name
     std::map<std::string, GUIGlObject*> myFullNameMap;
+
+    /// @brief Count of objects by type
+    std::map<GUIGlObjectType, long> myObjectCounts;
 
     /// @brief The next id to give; initially one, increased by one with each object registration
     GUIGlID myNextID;

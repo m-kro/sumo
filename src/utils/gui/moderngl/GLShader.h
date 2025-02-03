@@ -24,8 +24,6 @@
 #include <GL/glew.h>
 #endif
 #include <string>
-#include <vector>
-#include <unordered_map>
 
 class GLShader {
 
@@ -33,24 +31,14 @@ public:
     GLShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
     ~GLShader();
 
-    void bind() const;
-    void unbind() const;
-    GLuint getProgramID() const { return myProgramID; };
     GLuint getVertexShaderID() const { return myVertexShaderID; };
     GLuint getFragmentShaderID() const { return myFragmentShaderID; };
-    GLuint getUniformID(const std::string& key);
-    void setUniform(const std::string& key, const float value);
-    void setUniform(const std::string& key, const float v1, const float v2, const float v3);
-    void setUniform(const std::string& key, const float v1, const float v2, const float v3, const float v4);
-
     std::string readShaderFile(const std::string& path) const;
 
 private:
     GLuint compileShader(GLuint type, const std::string& source);
 
 private:
-    GLuint myProgramID;
     GLuint myVertexShaderID;
     GLuint myFragmentShaderID;
-    std::unordered_map<std::string, GLuint> myUniforms;
 };
