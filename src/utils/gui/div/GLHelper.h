@@ -88,7 +88,10 @@ public:
     static void checkCounterName();
 
     /// @brief get ref to the vertex data
-    static GLBufferStruct* getVertexData();
+    static std::vector<double>& getVertexData();
+    
+    /// @brief clear vertex data
+    static void clearVertexData();
 
     /** @brief Draws a filled polygon described by the list of points
      * @note this only works well for convex polygons
@@ -418,6 +421,13 @@ public:
                                      const double width, const double length, const bool vehicle);
 
 private:
+    /// @brief Add vertx data (position and colour) to the global vertex storage (to be transferred to the GPU)
+    static void addVertex(const Position& pos, const RGBColor& col);
+    static void addVertex(const Position& pos);
+    static void addVertex(float x, float y , float z);
+    static void addVertex(float x, float y, float z, float r, float g, float b, float a);
+
+private:
     /// @brief whether the road makes a right turn (or goes straight)
     static bool rightTurn(double angle1, double angle2);
 
@@ -443,7 +453,13 @@ private:
     static std::vector<std::pair<double, double> > myCircleCoords;
 
     /// @brief Storage for precomputed sin/cos-values describing a circle
-    static std::vector<GLBufferStruct> myVertices;
+    static std::vector<double> myVertices;
+
+    /// @brief Storage for current color (helper variable for transition to modern OpenGL)
+    static RGBColor myCurrentColor;
+
+    /// @brief Layer / Z coordinate
+    static double myCurrentLayer;
 
     /// @brief Font context
     static struct FONScontext* myFont;

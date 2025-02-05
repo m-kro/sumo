@@ -17,10 +17,14 @@
 ///
 //
 /****************************************************************************/
+#pragma once
+#include <config.h>
 
 #ifndef __glew_h__
 #include <GL/glew.h>
 #endif
+#include <glm.hpp>
+
 #include <string>
 #include <map>
 

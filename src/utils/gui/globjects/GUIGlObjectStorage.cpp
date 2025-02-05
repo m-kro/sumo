@@ -52,7 +52,6 @@ GUIGlObjectStorage::registerObject(GUIGlObject* object) {
     const GUIGlID id = myNextID;
     if (id == myObjects.size()) {
         myObjects.push_back(object);
-        myObjectCounts[object->getType()]++;
     } else {
         myObjects[id] = object;
     }
@@ -100,7 +99,6 @@ bool
 GUIGlObjectStorage::remove(GUIGlID id) {
     FXMutexLock locker(myLock);
     assert(id < myObjects.size() && myObjects[id] != nullptr);
-    myObjectCounts[myObjects[id]->getType()]--;
     myFullNameMap.erase(myObjects[id]->getFullName());
     const bool wasBlocked = myObjects[id]->isBlocked();
     myObjects[id] = nullptr;
@@ -134,12 +132,6 @@ GUIGlObjectStorage::unblockObject(GUIGlID id) {
 const std::vector<GUIGlObject*>&
 GUIGlObjectStorage::getAllGLObjects() const {
     return myObjects;
-}
-
-
-long
-GUIGlObjectStorage::getObjectCount(GUIGlObjectType type) const {
-    return (myObjectCounts.find(type) != myObjectCounts.end()) ? myObjectCounts.at(type) : 0;
 }
 
 /****************************************************************************/

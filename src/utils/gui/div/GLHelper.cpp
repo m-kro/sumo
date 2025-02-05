@@ -67,7 +67,9 @@ int GLHelper::myVertexCounter = 0;
 int GLHelper::myMatrixCounterDebug = 0;
 int GLHelper::myNameCounter = 0;
 std::vector<std::pair<double, double> > GLHelper::myCircleCoords;
-std::vector<GLBufferStruct> GLHelper::myVertices;
+std::vector<double> GLHelper::myVertices;
+RGBColor GLHelper::myCurrentColor(255,255,255,255);
+double GLHelper::myCurrentLayer = 0.;
 std::vector<RGBColor> GLHelper::myDottedcontourColors;
 FONScontext* GLHelper::myFont = nullptr;
 double GLHelper::myFontSize = 50.0;
@@ -210,10 +212,15 @@ GLHelper::checkCounterName() {
 }
 
 
-GLBufferStruct*
+std::vector<double>&
 GLHelper::getVertexData() {
-    // TODO: return ref to GLHelper::myVertices
-    return &myVertices.front();
+    return myVertices;
+}
+
+
+void
+GLHelper::clearVertexData() {
+    myVertices.clear();
 }
 
 
@@ -310,6 +317,16 @@ GLHelper::drawRectangle(const Position& center, const double width, const double
     // -0.5, 0.5
     //  0.5,-0.5
     //  0.5, 0.5
+
+    // TODO: DEBUG Modern OpenGL test data structure
+    float centerX = center.x();
+    float centerY = center.y();
+    addVertex(centerX - halfWidth, centerY + halfHeight, 0.); // P0
+    addVertex(centerX - halfWidth, centerY - halfHeight, 0.); // P1
+    addVertex(centerX + halfWidth, centerY - halfHeight, 0.); // P2
+    addVertex(centerX + halfWidth, centerY - halfHeight, 0.); // P2
+    addVertex(centerX + halfWidth, centerY + halfHeight, 0.); // P3
+    addVertex(centerX - halfWidth, centerY + halfHeight, 0.); // P0
 
     glEnd();
     GLHelper::popMatrix();
@@ -673,6 +690,7 @@ GLHelper::drawTriangleAtEnd(const Position& p1, const Position& p2, double tLeng
 
 void
 GLHelper::setColor(const RGBColor& c) {
+    myCurrentColor.set(c.red(), c.green(), c.blue(), c.alpha());
     glColor4ub(c.red(), c.green(), c.blue(), c.alpha());
 }
 
@@ -736,6 +754,40 @@ GLHelper::drawSpaceOccupancies(const double exaggeration, const Position& pos, c
     GLHelper::drawBoxLines(geom, 0.1 * exaggeration);
     // pop matrix
     GLHelper::popMatrix();
+}
+
+
+void
+GLHelper::addVertex(const Position& pos, const RGBColor& col) {
+    addVertex(pos.x(), pos.y(), myCurrentLayer, col.red() / 255.f, col.green() / 255.f, col.blue() / 255.f, col.alpha() / 255.f);
+}
+
+
+void
+GLHelper::addVertex(const Position& pos) {
+    addVertex(pos.x(), pos.y(), myCurrentLayer);
+}
+
+
+void
+GLHelper::addVertex(float x, float y, float z) {
+    addVertex(x, y, myCurrentLayer, myCurrentColor.red() / 255.f, myCurrentColor.green() / 255.f, myCurrentColor.blue() / 255.f, myCurrentColor.alpha() / 255.f);
+}
+
+
+void
+GLHelper::addVertex(float x, float y, float z, float r, float g, float b, float a) {
+    GLHelper::myVertices.push_back(x);
+    GLHelper::myVertices.push_back(y);
+    GLHelper::myVertices.push_back(z);
+    GLHelper::myVertices.push_back(r);
+    GLHelper::myVertices.push_back(g);
+    GLHelper::myVertices.push_back(b);
+    GLHelper::myVertices.push_back(a);
+
+#ifdef CHECK_ELEMENTCOUNTER
+    myVertexCounter++;
+#endif
 }
 
 
