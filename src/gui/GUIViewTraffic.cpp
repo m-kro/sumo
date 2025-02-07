@@ -58,6 +58,8 @@
 #include <utils/gui/globjects/GUIGlObjectStorage.h>
 #include <utils/gui/globjects/GUIShapeContainer.h>
 #include <utils/gui/images/GUIIconSubSys.h>
+#include <utils/gui/moderngl/GLShader.h>
+#include <utils/gui/moderngl/GLBufferStruct.h>
 #include <utils/gui/settings/GUICompleteSchemeStorage.h>
 #include <utils/gui/windows/GUIAppEnum.h>
 #include <utils/gui/windows/GUIDialog_ViewSettings.h>
@@ -85,22 +87,13 @@ GUIViewTraffic::GUIViewTraffic(
     , myCurrentVideo(nullptr)
 #endif
 {
-    /*
-    makeCurrent();
-    GLenum err = glewInit();
-    if (GLEW_OK != err) {
-        WRITE_ERRORF("GLEW OpenGL init failed with error code %", toString(err));
-    } else {
-        WRITE_MESSAGEF("GLEW OpenGL init passed with return code %", toString(err));
-    }
-    makeNonCurrent();
-    */
 }
 
 
 GUIViewTraffic::~GUIViewTraffic() {
     endSnapshot();
     //delete myContext;
+    //if (myRenderer != nullptr) { delete myRenderer; }
 }
 
 
@@ -325,6 +318,14 @@ GUIViewTraffic::getPOIParamKeys() const {
     return std::vector<std::string>(keys.begin(), keys.end());
 }
 
+
+void
+GUIViewTraffic::create() {
+    MFXGLCanvas::create();
+    initModernOpenGL();
+}
+
+
 int
 GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
     // init view settings
@@ -336,6 +337,9 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
+
+    // TODO: Test/Debug insert modern OpenGL drawing routine here
+
 
     // draw decals (if not in grabbing mode)
     drawDecals();
@@ -774,6 +778,26 @@ GUIViewTraffic::changePedestrianNetworkColor(const GUIVisualizationSettings& s) 
         }
     }
     update();
+}
+
+
+void
+GUIViewTraffic::initModernOpenGL() {
+    // create modern OpenGL structures
+    if (getenv("SUMO_HOME") != nullptr && myRenderer == nullptr) {
+        // shader paths
+        const std::string vertexShaderPath = std::string(getenv("SUMO_HOME")) + "/data/shaders/testVertexShader.glsl";
+        const std::string fragmentShaderPath = std::string(getenv("SUMO_HOME")) + "/data/shaders/testFragmentShader.glsl";
+        const std::vector<GLShader> shaders = { GLShader(vertexShaderPath, fragmentShaderPath) };
+
+        myRenderer = new GLRenderer();
+        myRenderer->addShaders(shaders);
+        GLBufferStruct bufferStruct;
+        bufferStruct.attributes.push_back({ "position", 3 });
+        bufferStruct.attributes.push_back({ "color", 4 });
+        myRenderer->setVertexAttributes(bufferStruct);
+
+    }
 }
 
 /****************************************************************************/

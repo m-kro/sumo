@@ -23,13 +23,12 @@
 #ifndef __glew_h__
 #include <GL/glew.h>
 #endif
-#include <glm.hpp>
 
 #include <string>
-#include <map>
+#include <vector>
 
 struct GLBufferStruct {
-    std::map<std::string, int> attributes;
+    std::vector<std::pair<std::string, int>> attributes;
     GLuint type = GL_FLOAT;
 
     const unsigned int getTypeSize() const {

@@ -32,6 +32,7 @@
 #include <utils/geom/PositionVector.h>
 #include "GUISUMOViewParent.h"
 #include <utils/gui/windows/GUISUMOAbstractView.h>
+#include <utils/gui/moderngl/GLRenderer.h>
 
 
 // ===========================================================================
@@ -143,10 +144,19 @@ public:
     /// @param s The visualization settings
     void changePedestrianNetworkColor(const GUIVisualizationSettings& s) const override;
 
+    /// @brief Init modern OpenGL structure
+    /// Create all of the server-side resources for this window
+    void create() override;
+
 protected:
     int doPaintGL(int mode, const Boundary& bound) override;
 
     GUILane* getLaneUnderCursor() override;
+
+    GUIViewTraffic() { }
+
+private:
+    void initModernOpenGL();
 
 private:
     GUIGlID myTrackedID;
@@ -154,11 +164,13 @@ private:
     /// @brief whether game mode was set to 'tls'
     bool myTLSGame;
 
+    /// @brief modern OpenGL rendering
+    GLRenderer* myRenderer;
+
 #ifdef HAVE_FFMPEG
     GUIVideoEncoder* myCurrentVideo;
 #endif
 
-protected:
-    GUIViewTraffic() { }
+
 
 };
