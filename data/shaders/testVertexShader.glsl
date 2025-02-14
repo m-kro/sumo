@@ -1,13 +1,10 @@
-#version 330 core
+#version 330 compatibility
 layout(location = 0) in vec3 vVertex;
-layout(location = 1) in vec3 vColor;
-smooth out vec4 vSmoothColor;
-
-uniform mat4 model;
-uniform mat4 projection;
+layout(location = 1) in vec4 vColor;
+out vec4 vSmoothColor;
 
 void main()
 {
-    vSmoothColor = vec4(vColor,1);
-    gl_Position = projection*model*vec4(vVertex,1);
+    vSmoothColor = vColor;
+    gl_Position = vec4(vVertex, 1.0);
 }

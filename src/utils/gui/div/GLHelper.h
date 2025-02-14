@@ -88,7 +88,7 @@ public:
     static void checkCounterName();
 
     /// @brief get ref to the vertex data
-    static std::vector<double>& getVertexData();
+    static std::vector<GLBufferStruct>& getVertexData();
     
     /// @brief clear vertex data
     static void clearVertexData();
@@ -453,7 +453,7 @@ private:
     static std::vector<std::pair<double, double> > myCircleCoords;
 
     /// @brief Storage for precomputed sin/cos-values describing a circle
-    static std::vector<double> myVertices;
+    static std::vector<GLBufferStruct> myVertices;
 
     /// @brief Storage for current color (helper variable for transition to modern OpenGL)
     static RGBColor myCurrentColor;

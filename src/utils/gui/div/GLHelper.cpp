@@ -50,6 +50,7 @@
 #define CIRCLE_RESOLUTION (double)10 // inverse in degrees
 //#define CHECK_PUSHPOP         // enable or disable check push and pop matrix/names
 #define CHECK_ELEMENTCOUNTER  // enable or disable element counter (for matrix and vertex)
+#define MODERN_OPENGL
 
 #ifndef CALLBACK
 #define CALLBACK
@@ -67,7 +68,7 @@ int GLHelper::myVertexCounter = 0;
 int GLHelper::myMatrixCounterDebug = 0;
 int GLHelper::myNameCounter = 0;
 std::vector<std::pair<double, double> > GLHelper::myCircleCoords;
-std::vector<double> GLHelper::myVertices;
+std::vector<GLBufferStruct> GLHelper::myVertices;
 RGBColor GLHelper::myCurrentColor(255,255,255,255);
 double GLHelper::myCurrentLayer = 0.;
 std::vector<RGBColor> GLHelper::myDottedcontourColors;
@@ -212,7 +213,7 @@ GLHelper::checkCounterName() {
 }
 
 
-std::vector<double>&
+std::vector<GLBufferStruct>&
 GLHelper::getVertexData() {
     return myVertices;
 }
@@ -235,14 +236,14 @@ GLHelper::drawFilledPoly(const PositionVector& v, bool close) {
         const Position& p = *i;
         glVertex2d(p.x(), p.y());
 #ifdef CHECK_ELEMENTCOUNTER
-        myVertexCounter++;
+        //myVertexCounter++;
 #endif
     }
     if (close) {
         const Position& p = *(v.begin());
         glVertex2d(p.x(), p.y());
 #ifdef CHECK_ELEMENTCOUNTER
-        myVertexCounter++;
+        //myVertexCounter++;
 #endif
     }
     glEnd();
@@ -302,22 +303,7 @@ void
 GLHelper::drawRectangle(const Position& center, const double width, const double height) {
     const double halfWidth = width * 0.5;
     const double halfHeight = height * 0.5;
-    GLHelper::pushMatrix();
-    glTranslated(center.x(), center.y(), 0);
-    glBegin(GL_QUADS);
-    glVertex2d(-halfWidth, halfHeight);
-    glVertex2d(-halfWidth, -halfHeight);
-    glVertex2d(halfWidth, -halfHeight);
-    glVertex2d(halfWidth, halfHeight);
-
-    // order of vertices if triangles should be created:
-    // -0.5, 0.5
-    // -0.5,-0.5
-    //  0.5,-0.5
-    // -0.5, 0.5
-    //  0.5,-0.5
-    //  0.5, 0.5
-
+#ifdef MODERN_OPENGL
     // TODO: DEBUG Modern OpenGL test data structure
     float centerX = center.x();
     float centerY = center.y();
@@ -327,9 +313,19 @@ GLHelper::drawRectangle(const Position& center, const double width, const double
     addVertex(centerX + halfWidth, centerY - halfHeight, 0.); // P2
     addVertex(centerX + halfWidth, centerY + halfHeight, 0.); // P3
     addVertex(centerX - halfWidth, centerY + halfHeight, 0.); // P0
+#else
 
+    GLHelper::pushMatrix();
+    glTranslated(center.x(), center.y(), 0);
+    glBegin(GL_QUADS);
+    glVertex2d(-halfWidth, halfHeight);
+    glVertex2d(-halfWidth, -halfHeight);
+    glVertex2d(halfWidth, -halfHeight);
+    glVertex2d(halfWidth, halfHeight);
     glEnd();
     GLHelper::popMatrix();
+#endif
+
 #ifdef CHECK_ELEMENTCOUNTER
     myVertexCounter += 4;
 #endif
@@ -349,7 +345,7 @@ GLHelper::drawBoxLine(const Position& beg, double rot, double visLength,
     glEnd();
     GLHelper::popMatrix();
 #ifdef CHECK_ELEMENTCOUNTER
-    myVertexCounter += 4;
+    //myVertexCounter += 4;
 #endif
 }
 
@@ -369,7 +365,7 @@ GLHelper::drawBoxLine(const Position& beg1, const Position& beg2,
     glEnd();
     GLHelper::popMatrix();
 #ifdef CHECK_ELEMENTCOUNTER
-    myVertexCounter += 4;
+    //myVertexCounter += 4;
 #endif
 }
 
@@ -395,7 +391,7 @@ GLHelper::drawBoxLines(const PositionVector& geom,
     // draw the lane
     int e = (int) geom.size() - 1;
     for (int i = 0; i < e; i++) {
-        drawBoxLine(geom[i], rots[i], lengths[i], width, offset);
+        //drawBoxLine(geom[i], rots[i], lengths[i], width, offset);
     }
     // draw the corner details
     if (cornerDetail > 0) {
@@ -483,7 +479,7 @@ GLHelper::drawLine(const Position& beg, double rot, double visLength) {
     glEnd();
     GLHelper::popMatrix();
 #ifdef CHECK_ELEMENTCOUNTER
-    myVertexCounter += 2;
+    //myVertexCounter += 2;
 #endif
 }
 
@@ -500,7 +496,7 @@ GLHelper::drawLine(const Position& beg1, const Position& beg2,
     glEnd();
     GLHelper::popMatrix();
 #ifdef CHECK_ELEMENTCOUNTER
-    myVertexCounter += 2;
+    //myVertexCounter += 2;
 #endif
 }
 
@@ -514,7 +510,7 @@ GLHelper::drawLine(const PositionVector& v) {
         glVertex2d(v[i].x(), v[i].y());
         glVertex2d(v[i + 1].x(), v[i + 1].y());
 #ifdef CHECK_ELEMENTCOUNTER
-        myVertexCounter += 2;
+        //myVertexCounter += 2;
 #endif
     }
     glEnd();
@@ -530,7 +526,7 @@ GLHelper::drawLine(const PositionVector& v, const std::vector<RGBColor>& cols) {
         glVertex2d(v[i].x(), v[i].y());
         glVertex2d(v[i + 1].x(), v[i + 1].y());
 #ifdef CHECK_ELEMENTCOUNTER
-        myVertexCounter += 2;
+        //myVertexCounter += 2;
 #endif
     }
     glEnd();
@@ -544,7 +540,7 @@ GLHelper::drawLine(const Position& beg, const Position& end) {
     glVertex2d(end.x(), end.y());
     glEnd();
 #ifdef CHECK_ELEMENTCOUNTER
-    myVertexCounter += 2;
+    //myVertexCounter += 2;
 #endif
 }
 
@@ -597,7 +593,7 @@ GLHelper::drawFilledCircleDetailled(const GUIVisualizationSettings::Detail d, co
             glEnd();
             GLHelper::popMatrix();
 #ifdef CHECK_ELEMENTCOUNTER
-            myVertexCounter += 4;
+            //myVertexCounter += 4;
 #endif
             break;
     }
@@ -624,7 +620,7 @@ GLHelper::drawFilledCircle(double radius, int steps, double beg, double end) {
         glEnd();
         p1 = p2;
 #ifdef CHECK_ELEMENTCOUNTER
-        myVertexCounter += 3;
+        //myVertexCounter += 3;
 #endif
     }
 }
@@ -657,7 +653,7 @@ GLHelper::drawOutlineCircle(double radius, double iRadius, int steps,
         glEnd();
         p1 = p2;
 #ifdef CHECK_ELEMENTCOUNTER
-        myVertexCounter += 6;
+        //myVertexCounter += 6;
 #endif
     }
 }
@@ -683,7 +679,7 @@ GLHelper::drawTriangleAtEnd(const Position& p1, const Position& p2, double tLeng
     glEnd();
     GLHelper::popMatrix();
 #ifdef CHECK_ELEMENTCOUNTER
-    myVertexCounter += 3;
+    //myVertexCounter += 3;
 #endif
 }
 
@@ -691,7 +687,7 @@ GLHelper::drawTriangleAtEnd(const Position& p1, const Position& p2, double tLeng
 void
 GLHelper::setColor(const RGBColor& c) {
     myCurrentColor.set(c.red(), c.green(), c.blue(), c.alpha());
-    glColor4ub(c.red(), c.green(), c.blue(), c.alpha());
+    //glColor4ub(c.red(), c.green(), c.blue(), c.alpha());
 }
 
 
@@ -759,7 +755,7 @@ GLHelper::drawSpaceOccupancies(const double exaggeration, const Position& pos, c
 
 void
 GLHelper::addVertex(const Position& pos, const RGBColor& col) {
-    addVertex(pos.x(), pos.y(), myCurrentLayer, col.red() / 255.f, col.green() / 255.f, col.blue() / 255.f, col.alpha() / 255.f);
+    addVertex(pos.x(), pos.y(), myCurrentLayer, col.red(), col.green(), col.blue(), col.alpha());
 }
 
 
@@ -771,19 +767,14 @@ GLHelper::addVertex(const Position& pos) {
 
 void
 GLHelper::addVertex(float x, float y, float z) {
-    addVertex(x, y, myCurrentLayer, myCurrentColor.red() / 255.f, myCurrentColor.green() / 255.f, myCurrentColor.blue() / 255.f, myCurrentColor.alpha() / 255.f);
+    addVertex(x, y, myCurrentLayer, myCurrentColor.red(), myCurrentColor.green(), myCurrentColor.blue(), myCurrentColor.alpha());
 }
 
 
 void
 GLHelper::addVertex(float x, float y, float z, float r, float g, float b, float a) {
-    GLHelper::myVertices.push_back(x);
-    GLHelper::myVertices.push_back(y);
-    GLHelper::myVertices.push_back(z);
-    GLHelper::myVertices.push_back(r);
-    GLHelper::myVertices.push_back(g);
-    GLHelper::myVertices.push_back(b);
-    GLHelper::myVertices.push_back(a);
+    GLBufferStruct vertex = { { x, y, z }, { r, g, b, a } };
+    myVertices.push_back(vertex);
 
 #ifdef CHECK_ELEMENTCOUNTER
     myVertexCounter++;
@@ -948,7 +939,7 @@ GLHelper::drawCrossTies(const PositionVector& geom, const std::vector<double>& r
                 glVertex2d(halfWidth - offset, -t);
                 glEnd();
 #ifdef CHECK_ELEMENTCOUNTER
-                myVertexCounter += 4;
+                //myVertexCounter += 4;
 #endif
             }
         } else {
@@ -960,7 +951,7 @@ GLHelper::drawCrossTies(const PositionVector& geom, const std::vector<double>& r
             glVertex2d(halfWidth - offset, 0);
             glEnd();
 #ifdef CHECK_ELEMENTCOUNTER
-            myVertexCounter += 4;
+            //myVertexCounter += 4;
 #endif
         }
         // pop three draw matrix
@@ -999,7 +990,7 @@ GLHelper::drawInverseMarkings(const PositionVector& geom,
                 glVertex2d(-mw2, -t);
                 glEnd();
 #ifdef CHECK_ELEMENTCOUNTER
-                myVertexCounter += 4;
+                //myVertexCounter += 4;
 #endif
                 if (!cl || !cr) {
                     // draw inverse marking between asymmetrical lane markings
@@ -1011,7 +1002,7 @@ GLHelper::drawInverseMarkings(const PositionVector& geom,
                     glVertex2d(-halfWidth - 0.02, -t - length2);
                     glEnd();
 #ifdef CHECK_ELEMENTCOUNTER
-                    myVertexCounter += 4;
+                    //myVertexCounter += 4;
 #endif
                 }
             }

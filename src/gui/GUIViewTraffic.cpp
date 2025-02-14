@@ -338,9 +338,6 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
 
-    // TODO: Test/Debug insert modern OpenGL drawing routine here
-
-
     // draw decals (if not in grabbing mode)
     drawDecals();
     myVisualizationSettings->scale = m2p(SUMO_const_laneWidth);
@@ -376,6 +373,33 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
     GUIColoringSchemesMap<GUILane> &sm = GUIViewTraffic::getLaneSchemesMap(); //!!!
     sm.getColorer(myVisualizationSettings->laneEdgeMode)->drawLegend();
     */
+
+    // TODO: Test/Debug insert modern OpenGL drawing routine here
+    if (myRenderer != nullptr) {
+        // create black polygon rectangles at the four corners of the view
+        GLHelper::clearVertexData();
+        // transmit data to renderer
+
+
+        // rectangles
+        GLHelper::setColor(RGBColor(0, 0, 255));
+        Position pos1(0.5f, 0.5f);
+        GLHelper::drawRectangle(pos1, 1.f, 1.f);
+
+        //GLHelper::setColor(RGBColor(0, 255, 0));
+        //Position pos2(0.5, 0.5);
+        //GLHelper::drawRectangle(pos2, 0.5, 0.5);
+
+        if (GLHelper::getVertexCounter() > 0) {
+            myRenderer->checkBufferSizes(GUIGlObjectType::GLO_POLYGON);
+            myRenderer->setVertexData(GUIGlObjectType::GLO_POLYGON, GLHelper::getVertexData());
+            // render
+            //myRenderer->bind();
+            myRenderer->paintGL();
+            //myRenderer->unbind();
+        }
+    }
+
     return hits2;
 }
 
@@ -786,17 +810,20 @@ GUIViewTraffic::initModernOpenGL() {
     // create modern OpenGL structures
     if (getenv("SUMO_HOME") != nullptr && myRenderer == nullptr) {
         // shader paths
-        const std::string vertexShaderPath = std::string(getenv("SUMO_HOME")) + "/data/shaders/testVertexShader.glsl";
-        const std::string fragmentShaderPath = std::string(getenv("SUMO_HOME")) + "/data/shaders/testFragmentShader.glsl";
+        const std::string vertexShaderPath = "D:/Repos/sumo-opengl3.3/data/shaders/testVertexShader.glsl"; // production value should be: std::string(getenv("SUMO_HOME")) + "/data/shaders/testVertexShader.glsl";
+        const std::string fragmentShaderPath = "D:/Repos/sumo-opengl3.3/data/shaders/testFragmentShader.glsl"; // production value should be: std::string(getenv("SUMO_HOME")) + "/data/shaders/testFragmentShader.glsl";
         const std::vector<GLShader> shaders = { GLShader(vertexShaderPath, fragmentShaderPath) };
 
-        myRenderer = new GLRenderer();
+        myRenderer = std::make_shared<GLRenderer>();
         myRenderer->addShaders(shaders);
         GLBufferStruct bufferStruct;
-        bufferStruct.attributes.push_back({ "position", 3 });
-        bufferStruct.attributes.push_back({ "color", 4 });
+        //bufferStruct.attributes.push_back({ "position", 3 });
+        //bufferStruct.attributes.push_back({ "color", 4 });
+        myRenderer->addVAO(GUIGlObjectType::GLO_POLYGON);
+        myRenderer->activateVAO(GUIGlObjectType::GLO_POLYGON);
+        myRenderer->bind();
         myRenderer->setVertexAttributes(bufferStruct);
-
+        //myRenderer->deactivateVAO(GUIGlObjectType::GLO_POLYGON);
     }
 }
 

@@ -24,26 +24,7 @@
 #include <GL/glew.h>
 #endif
 
-#include <string>
-#include <vector>
-
 struct GLBufferStruct {
-    std::vector<std::pair<std::string, int>> attributes;
-    GLuint type = GL_FLOAT;
-
-    const unsigned int getTypeSize() const {
-        return (type == GL_FLOAT) ? sizeof(float) : 0;
-    }
-
-    const unsigned int getByteSize() const {
-        return getTypeSize() * getSize();
-    }
-
-    const unsigned int getSize() const{
-        unsigned int items = 0;
-        for (auto const& attribute : attributes) {
-            items += attribute.second;
-        }
-        return items;
-    }
+    float position[3];
+    char color[4];
 };

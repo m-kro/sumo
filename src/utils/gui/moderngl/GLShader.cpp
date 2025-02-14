@@ -58,6 +58,9 @@ GLuint GLShader::compileShader(GLuint type, const std::string& source) {
     const char* src = source.c_str();
     glShaderSource(shaderID, 1, &src, nullptr);
     glCompileShader(shaderID);
+#ifdef _DEBUG
+    std::cout << "GLShader::compileShader glCompileShader(" << shaderID << ")" << std::endl;
+#endif
     int result;
     glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
     if (result == GL_FALSE) {

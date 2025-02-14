@@ -165,7 +165,7 @@ private:
     bool myTLSGame;
 
     /// @brief modern OpenGL rendering
-    GLRenderer* myRenderer;
+    std::shared_ptr<GLRenderer> myRenderer;
 
 #ifdef HAVE_FFMPEG
     GUIVideoEncoder* myCurrentVideo;
