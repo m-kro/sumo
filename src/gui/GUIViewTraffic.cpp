@@ -31,6 +31,10 @@
 #include <utility>
 #include <cmath>
 #include <limits>
+
+#include "glm.hpp"
+#include "gtc/matrix_transform.hpp"
+
 #include <foreign/rtree/SUMORTree.h>
 #include <gui/GUIApplicationWindow.h>
 #include <gui/GUIGlobals.h>
@@ -93,7 +97,6 @@ GUIViewTraffic::GUIViewTraffic(
 GUIViewTraffic::~GUIViewTraffic() {
     endSnapshot();
     //delete myContext;
-    //if (myRenderer != nullptr) { delete myRenderer; }
 }
 
 
@@ -323,6 +326,11 @@ void
 GUIViewTraffic::create() {
     MFXGLCanvas::create();
     initModernOpenGL();
+
+#ifdef _DEBUG
+    // check obtained OpenGL version
+    WRITE_MESSAGEF("The obtained OpenGL version is %.", glGetString(GL_VERSION));
+#endif
 }
 
 
@@ -331,7 +339,7 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
     // init view settings
     glRenderMode(mode);
     glMatrixMode(GL_MODELVIEW);
-    GLHelper::pushMatrix();
+    //GLHelper::pushMatrix();
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
@@ -344,6 +352,7 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
     if (myVisualizationSettings->showGrid) {
         paintGLGrid();
     }
+
     glLineWidth(1);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     const float minB[2] = { (float)bound.xmin(), (float)bound.ymin() };
@@ -352,6 +361,7 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
     glEnable(GL_POLYGON_OFFSET_LINE);
     const SUMORTree& grid = GUINet::getGUIInstance()->getVisualisationSpeedUp(myVisualizationSettings->secondaryShape);
     int hits2 = grid.Search(minB, maxB, *myVisualizationSettings);
+
     GUIGlobals::gSecondaryShape = myVisualizationSettings->secondaryShape;
     // Draw additional objects
     if (myAdditionallyDrawn.size() > 0) {
@@ -364,39 +374,36 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
         glTranslated(0, 0, .01);
     }
     GLHelper::popMatrix();
-    /*
-    // draw legends
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslated(1.-.2, 1.-.5, 0.);
-    glScaled(.2, .5, 1.);
-    GUIColoringSchemesMap<GUILane> &sm = GUIViewTraffic::getLaneSchemesMap(); //!!!
-    sm.getColorer(myVisualizationSettings->laneEdgeMode)->drawLegend();
-    */
 
-    // TODO: Test/Debug insert modern OpenGL drawing routine here
+    // Test/Debug insert modern OpenGL drawing routine here
     if (myRenderer != nullptr) {
         // create black polygon rectangles at the four corners of the view
         GLHelper::clearVertexData();
         // transmit data to renderer
 
-
         // rectangles
-        GLHelper::setColor(RGBColor(0, 0, 255));
-        Position pos1(0.5f, 0.5f);
-        GLHelper::drawRectangle(pos1, 1.f, 1.f);
+        GLHelper::setColor(RGBColor(0, 255, 0));
+        Position pos1(150.f, 20.f);
+        GLHelper::drawRectangle(pos1, 150.f, 150.f);
 
-        //GLHelper::setColor(RGBColor(0, 255, 0));
-        //Position pos2(0.5, 0.5);
-        //GLHelper::drawRectangle(pos2, 0.5, 0.5);
+        GLHelper::setColor(RGBColor(0, 0, 255));
+        Position pos2(250., 500.);
+        GLHelper::drawRectangle(pos2, 30., 80.);
 
         if (GLHelper::getVertexCounter() > 0) {
+            // render
+            // set camera perspective through GLSL uniform
+            glm::mat4 proj = glm::ortho(0.f, (float)getWidth(), 0.f, (float)getHeight(), -1.0f, 1.0f);
+            glm::mat4 scale = glm::scale(glm::mat4(1), glm::vec3((double)getWidth() / bound.getWidth(), (double)getHeight() / bound.getHeight(), 1));
+            glm::mat4 translate = glm::translate(glm::mat4(), glm::vec3(-bound.xmin(), -bound.ymin(), 0.0f));
+            myRenderer->bind();
+            myRenderer->setUniform("u_MVP", proj * scale * translate);
+            myRenderer->activateVAO(GUIGlObjectType::GLO_POLYGON);
             myRenderer->checkBufferSizes(GUIGlObjectType::GLO_POLYGON);
             myRenderer->setVertexData(GUIGlObjectType::GLO_POLYGON, GLHelper::getVertexData());
-            // render
-            //myRenderer->bind();
             myRenderer->paintGL();
-            //myRenderer->unbind();
+            myRenderer->deactivateVAO(GUIGlObjectType::GLO_POLYGON);
+            myRenderer->unbind();
         }
     }
 
@@ -823,6 +830,7 @@ GUIViewTraffic::initModernOpenGL() {
         myRenderer->activateVAO(GUIGlObjectType::GLO_POLYGON);
         myRenderer->bind();
         myRenderer->setVertexAttributes(bufferStruct);
+        myRenderer->unbind();
         //myRenderer->deactivateVAO(GUIGlObjectType::GLO_POLYGON);
     }
 }
