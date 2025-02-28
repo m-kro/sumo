@@ -54,9 +54,6 @@ public:
     /// @brief normalize angle for lookup in myCircleCoords
     static int angleLookup(double angleDeg);
 
-    /// @brief reset the global vertex counters
-    static void resetVertexCounters();
-
     /// @brief push matrix
     static void pushMatrix();
 
@@ -78,6 +75,9 @@ public:
     /// @brief get vertex counter
     static int getVertexCounter();
 
+    /// @brief get vertex counter (for modern OpenGL)
+    static long getVertexCounterModern();
+
     /// @brief reset vertex counter
     static void resetVertexCounter();
 
@@ -92,6 +92,9 @@ public:
     
     /// @brief clear vertex data
     static void clearVertexData();
+
+    /// @brief sum size of vertex attributes
+    static unsigned int computeVertexAttributeSize(const std::vector<std::pair<GLint, unsigned int>>& attributeDefinitions);
 
     /** @brief Draws a filled polygon described by the list of points
      * @note this only works well for convex polygons
@@ -120,6 +123,8 @@ public:
      * @param[in] height The height of the rectangle
      */
     static void drawRectangle(const Position& center, const double width, const double height);
+
+    static void drawRectangleModern(const Position& center, const double width, const double height);
 
     /** @brief Draws a thick line
      *
@@ -442,6 +447,9 @@ private:
 
     /// @brief matrix counter (for debug purposes)
     static int myVertexCounter;
+
+    /// @brief vertex counter
+    static long myVertexCounterModern;
 
     /// @brief matrix counter (for debug purposes)
     static int myMatrixCounterDebug;

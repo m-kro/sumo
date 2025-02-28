@@ -96,6 +96,7 @@ GUIViewTraffic::GUIViewTraffic(
 
 GUIViewTraffic::~GUIViewTraffic() {
     endSnapshot();
+    myRenderer->deactivateCurrentConfiguration();
     //delete myContext;
 }
 
@@ -339,7 +340,7 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
     // init view settings
     glRenderMode(mode);
     glMatrixMode(GL_MODELVIEW);
-    //GLHelper::pushMatrix();
+    GLHelper::pushMatrix();
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
@@ -377,33 +378,34 @@ GUIViewTraffic::doPaintGL(int mode, const Boundary& bound) {
 
     // Test/Debug insert modern OpenGL drawing routine here
     if (myRenderer != nullptr) {
-        // create black polygon rectangles at the four corners of the view
         GLHelper::clearVertexData();
-        // transmit data to renderer
 
-        // rectangles
+        // Debug / Demo rectangles
         GLHelper::setColor(RGBColor(0, 255, 0));
         Position pos1(150.f, 20.f);
-        GLHelper::drawRectangle(pos1, 150.f, 150.f);
+        GLHelper::drawRectangleModern(pos1, 150.f, 150.f);
 
         GLHelper::setColor(RGBColor(0, 0, 255));
         Position pos2(250., 500.);
-        GLHelper::drawRectangle(pos2, 30., 80.);
+        GLHelper::drawRectangleModern(pos2, 30., 80.);
 
-        if (GLHelper::getVertexCounter() > 0) {
+        if (GLHelper::getVertexCounterModern() > 0) {
             // render
             // set camera perspective through GLSL uniform
             glm::mat4 proj = glm::ortho(0.f, (float)getWidth(), 0.f, (float)getHeight(), -1.0f, 1.0f);
+
+            glm::mat4 rotate = glm::translate(glm::mat4(), glm::vec3(-bound.getCenter().x(), -bound.getCenter().y(), 0.0f));
+            rotate = glm::rotate(rotate, glm::radians((float)myChanger->getRotation()), glm::vec3(0.0, 0.0, 1.0));
+            rotate = glm::translate(rotate, glm::vec3(bound.getCenter().x(), bound.getCenter().y(), 0.0f));
+
             glm::mat4 scale = glm::scale(glm::mat4(1), glm::vec3((double)getWidth() / bound.getWidth(), (double)getHeight() / bound.getHeight(), 1));
             glm::mat4 translate = glm::translate(glm::mat4(), glm::vec3(-bound.xmin(), -bound.ymin(), 0.0f));
-            myRenderer->bind();
-            myRenderer->setUniform("u_MVP", proj * scale * translate);
-            myRenderer->activateVAO(GUIGlObjectType::GLO_POLYGON);
-            myRenderer->checkBufferSizes(GUIGlObjectType::GLO_POLYGON);
-            myRenderer->setVertexData(GUIGlObjectType::GLO_POLYGON, GLHelper::getVertexData());
+            myRenderer->activateConfiguration("Standard");
+            myRenderer->setUniform("u_MVP", proj * scale * translate * rotate);
+            myRenderer->checkBufferSizes();
+            myRenderer->setVertexData(GLHelper::getVertexData());
             myRenderer->paintGL();
-            myRenderer->deactivateVAO(GUIGlObjectType::GLO_POLYGON);
-            myRenderer->unbind();
+            myRenderer->deactivateCurrentConfiguration();
         }
     }
 
@@ -817,21 +819,18 @@ GUIViewTraffic::initModernOpenGL() {
     // create modern OpenGL structures
     if (getenv("SUMO_HOME") != nullptr && myRenderer == nullptr) {
         // shader paths
-        const std::string vertexShaderPath = "D:/Repos/sumo-opengl3.3/data/shaders/testVertexShader.glsl"; // production value should be: std::string(getenv("SUMO_HOME")) + "/data/shaders/testVertexShader.glsl";
-        const std::string fragmentShaderPath = "D:/Repos/sumo-opengl3.3/data/shaders/testFragmentShader.glsl"; // production value should be: std::string(getenv("SUMO_HOME")) + "/data/shaders/testFragmentShader.glsl";
-        const std::vector<GLShader> shaders = { GLShader(vertexShaderPath, fragmentShaderPath) };
+        // TODO: replace with production path
+        const std::string vertexShaderPath = "D:/Repos/sumo-opengl3.3/data/shaders/vertexShader.glsl"; // production value should be: std::string(getenv("SUMO_HOME")) + "/data/shaders/vertexShader.glsl";
+        const std::string fragmentShaderPath = "D:/Repos/sumo-opengl3.3/data/shaders/fragmentShader.glsl"; // production value should be: std::string(getenv("SUMO_HOME")) + "/data/shaders/fragmentShader.glsl";
+        const GLShader shader = GLShader(vertexShaderPath, fragmentShaderPath);
 
         myRenderer = std::make_shared<GLRenderer>();
-        myRenderer->addShaders(shaders);
-        GLBufferStruct bufferStruct;
-        //bufferStruct.attributes.push_back({ "position", 3 });
-        //bufferStruct.attributes.push_back({ "color", 4 });
-        myRenderer->addVAO(GUIGlObjectType::GLO_POLYGON);
-        myRenderer->activateVAO(GUIGlObjectType::GLO_POLYGON);
-        myRenderer->bind();
-        myRenderer->setVertexAttributes(bufferStruct);
-        myRenderer->unbind();
-        //myRenderer->deactivateVAO(GUIGlObjectType::GLO_POLYGON);
+        myRenderer->addShader("FaceColorShader", shader);
+        const std::vector<std::pair<GLint, unsigned int>> attributeDefinitions = { {GL_FLOAT, 3}, {GL_BYTE, 4} };
+        myRenderer->addConfiguration("Standard", "FaceColorShader", GLHelper::computeVertexAttributeSize(attributeDefinitions));
+        myRenderer->activateConfiguration("Standard");
+        myRenderer->setVertexAttributes(attributeDefinitions);
+        myRenderer->deactivateCurrentConfiguration();
     }
 }
 
